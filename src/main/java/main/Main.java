@@ -1,0 +1,257 @@
+package main;
+
+import com.google.gson.Gson;
+import org.lwjgl.Version;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryStack;
+
+import java.io.File;
+import java.io.FileReader;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
+public class Main {
+    private static final Gson gson = new Gson();
+
+    private long window;
+
+    public static float left_control = -0.1f; // stores the amount of which the joy stick is turned left
+    public static float right_control = 0.1f;
+    public static float display_padding = 0.1f;
+    public static float steering;
+    public static float brake;
+    public static float gas;
+
+    private Config config;
+
+    private FloatBuffer steering_buffer;
+    private ByteBuffer buttons_buffer;
+
+    private DrawFunction drawFunction;
+
+    public static void main(String... args) {
+        new Main().loadConfig().run();
+    }
+
+    public Main loadConfig() {
+
+        File cfg = new File("./config.json");
+        if (cfg.exists()) {
+            try (FileReader reader = new FileReader(cfg)) {
+                config = gson.fromJson(reader, Config.class);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                config = new Config();
+                writeConfig();
+            }
+        } else {
+            config = new Config();
+            writeConfig();
+        }
+        return this;
+    }
+
+    public void writeConfig() {
+        File cfg = new File("./config.json");
+        if (cfg.exists()) {
+            if (!cfg.renameTo(new File("./config.json.bak"))) return;
+        }
+        try (FileWriter writer = new FileWriter(cfg)) {
+            writer.write(gson.toJson(config));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void setDrawColor(int color) {
+        setDrawColor(color, 1f);
+    }
+
+    private void setDrawColor(int color, float alpha) {
+        int r = (color >> 16) & 255;
+        int g = (color >> 8) & 255;
+        int b = color & 255;
+
+        GL11.glColor4f(r / 255f, g / 255f, b / 255f, alpha);
+    }
+
+    private void init() {
+        // Setup an error callback. The default implementation
+        // will print the error message in System.err.
+        GLFWErrorCallback.createPrint(System.err).set();
+
+        // Initialize GLFW. Most GLFW functions will not work before doing this.
+        if (!glfwInit())
+            throw new IllegalStateException("Failed to init GLFW");
+
+        // Configure GLFW
+        glfwDefaultWindowHints(); // optional, the current window hints are
+        // already the default
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden
+        // after creation
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be
+        // resizable
+
+        // Create the window
+        window = glfwCreateWindow(config.window.width, config.window.height, "TRACK Pad", NULL, NULL);
+        if (window == NULL) {
+            throw new RuntimeException("Failed to create the GLFW window");
+        }
+
+        /*
+         * Setup a key callback. It will be called every time a key is pressed, repeated
+         * or released.
+         */
+
+        // Get the thread stack and push a new frame
+        try (MemoryStack stack = stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1); // int*
+            IntBuffer pHeight = stack.mallocInt(1); // int*
+
+            // Get the window size passed to glfwCreateWindow
+            glfwGetWindowSize(window, pWidth, pHeight);
+
+            // Get the resolution of the primary monitor
+            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+//            glfwGetPrimaryMonitor()
+            // Center the window
+//            vidmode.
+            glfwSetWindowPos(window, (vidmode.width() - pWidth.get(0)) / 2, (vidmode.height() - pHeight.get(0)) / 2);
+        } // the stack frame is popped automatically
+
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(window);
+        // Enable v-sync
+        GLFW.glfwSwapInterval(1);
+
+        // Make the window visible
+        glfwShowWindow(window);
+
+        GL.createCapabilities();
+
+        // manager = new RenderManager(window);
+        // renderer = new Renderer(window);
+        System.out.println("Joystick 0 found: " + glfwJoystickPresent(0));
+        steering_buffer = GLFW.glfwGetJoystickAxes(0);
+
+    }
+
+    private void doDraw() {
+        glDisable(GL_BLEND);
+
+//        GL11.glPushMatrix();
+        GL11.glBegin(GL_QUADS);
+        setDrawColor(config.backgroundColor);
+        glVertex2f(-1f, 1);
+        glVertex2f(1f, 1);
+        glVertex2f(1f, -1);
+        glVertex2f(-1f, -1);
+        GL11.glEnd();
+
+        glPolygonMode(GL_FRONT, GL_FILL);
+        glEnable(GL_BLEND | GL_POLYGON_SMOOTH | GL_LINE_SMOOTH | GL_POINT_SMOOTH);
+        glLineWidth(2.5f);
+
+        drawFunction.drawSteering(steering);
+        drawFunction.drawGas(gas);
+        drawFunction.drawBrake(brake);
+    }
+
+
+    private void handleJoyshits() {
+        steering_buffer = GLFW.glfwGetJoystickAxes(0);
+        buttons_buffer = glfwGetJoystickButtons(GLFW_JOYSTICK_1);
+
+//        if (steering_buffer != null) {
+        if (config.isAnalogueSteering) {
+            steering = steering_buffer.get(0);
+        } else {
+            //TODO:
+            // never gonna give you up, never gonna let you down, never gonna implement you, or merge you
+        }
+        if (!config.isDigitalThrottle) {
+            brake = (steering_buffer.get(2) + 1) / 2f;
+            gas = (steering_buffer.get(5) + 1) / 2f;
+        } else {
+            //TODO:
+            brake = buttons_buffer.get(config.brake_axis);
+            gas = buttons_buffer.get(config.gas_axis);
+        }
+        if (Math.abs(steering) < config.steeringDeadzone)
+            steering = 0;
+        if (Math.abs(brake) < 0.1)
+            brake = 0;
+        if (Math.abs(gas) < 0.1)
+            gas = 0;
+//        }
+    }
+
+
+    private void loop() {
+        /*
+         * This line is critical for LWJGL's interoperation with GLFW's OpenGL context,
+         * or any context that is managed externally. LWJGL detects the context that is
+         * current in the current thread, creates the GLCapabilities instance and makes
+         * the OpenGL bindings available for use.
+         */
+
+        // Set the clear color
+        GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_TEXTURE_2D);
+//		glEnable(GL11.GL_DEPTH_TEST);
+
+        // Run the rendering loop until the user has attempted to close
+        // the window or has pressed the ESCAPE key.
+        while (!glfwWindowShouldClose(window)) {
+            // clear the framebuffer
+            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+//             handle joyshits
+            handleJoyshits();
+            // Draw shit
+            doDraw();
+            // handle the players movement first, because it's more logical to
+            // do it like this
+            // this will be moved into a different thread later
+
+            // swap the color buffers
+            glfwSwapBuffers(window);
+            // event shit
+            GLFW.glfwPollEvents();
+
+        }
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL_TEXTURE_2D);
+    }
+
+    public void run() {
+        drawFunction = new DrawModeB(config);
+        System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+        System.setProperty("java.awt.headless", "true");
+        init();
+        loop();
+        // Free the window callbacks and destroy the window
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
+        //
+        // Terminate GLFW and free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
+    }
+}
