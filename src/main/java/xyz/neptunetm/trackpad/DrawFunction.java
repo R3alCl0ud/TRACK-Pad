@@ -1,4 +1,4 @@
-package main;
+package xyz.neptunetm.trackpad;
 
 public interface DrawFunction {
     void drawSteering(float turn);

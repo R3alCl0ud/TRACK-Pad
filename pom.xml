@@ -297,7 +297,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>main.Main</mainClass>
+                            <mainClass>xyz.neptunetm.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -1,4 +1,4 @@
-package main;
+package xyz.neptunetm.trackpad;
 
 import com.google.gson.Gson;
 import org.lwjgl.Version;
@@ -11,7 +11,6 @@ import org.lwjgl.system.MemoryStack;
 
 import java.io.File;
 import java.io.FileReader;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;

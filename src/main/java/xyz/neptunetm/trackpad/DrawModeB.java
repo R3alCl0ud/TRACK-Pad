@@ -1,4 +1,4 @@
-package main;
+package xyz.neptunetm.trackpad;
 
 import org.lwjgl.opengl.GL11;
 

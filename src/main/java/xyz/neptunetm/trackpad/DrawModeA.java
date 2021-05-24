@@ -1,9 +1,8 @@
-package main;
+package xyz.neptunetm.trackpad;
 
 import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glVertex2f;
 
 public class DrawModeA extends AbstractDrawMode {
     public static float left_control = -0.1f; // padding from the horizontal center

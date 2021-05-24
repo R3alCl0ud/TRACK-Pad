@@ -1,4 +1,4 @@
-package main;
+package xyz.neptunetm.trackpad;
 
 public class Config {
     //    public float backgroundColor;

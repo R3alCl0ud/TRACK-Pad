@@ -1,6 +1,5 @@
-package main;
+package xyz.neptunetm.trackpad;
 
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 public class GLBuilder {
