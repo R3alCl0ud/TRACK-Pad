@@ -48,7 +48,7 @@ public class DrawModeA extends AbstractDrawMode {
         glVertex2f(left_control, 1f - display_padding * 4);
 
         // setDrawColor(0x00000, .5f);
-        if (config.isAnalogueSteering) {
+        if (config.controls.isAnalogueSteering) {
             //50%
             glColor4f(60 / 255f, 60 / 255f, 60 / 255f, 0.75f); // black outline at %50
             glVertex2f(leftWidth / 2f + left_control, 0);
@@ -95,7 +95,7 @@ public class DrawModeA extends AbstractDrawMode {
         glVertex2f(0 + right_control, -1f + display_padding * 4);
         glVertex2f(0 + right_control, 1f - display_padding * 4);
 
-        if (config.isAnalogueSteering) {
+        if (config.controls.isAnalogueSteering) {
             //50%
             glColor4f(60 / 255f, 60 / 255f, 60 / 255f, 0.75f); // black outline at %50
             glVertex2f(rightWidth / 2f + right_control, 0);

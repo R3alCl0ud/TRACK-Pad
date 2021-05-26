@@ -15,23 +15,89 @@ public class DrawModeB extends AbstractDrawMode {
         final float maxTurnWidth = (1f - centerWidth / 2f - padding);
         final float turnWidth = turn * maxTurnWidth;
 
-        //left_arrow
+        //left_arrow background
+        GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
+                .color(0xEEEEEE, 1f)
+
+                .vertex(-centerWidth / 2f, 0)
+                .vertex(0, 1f - padding)
+                .vertex(-centerWidth * 2f + padding, 0)
+
+                .vertex(-centerWidth / 2f, 0)
+                .vertex(0, padding - 1f)
+                .vertex(-centerWidth * 2f + padding, 0)
+                .end();
+        // right arrow background
+        GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
+                .color(0xEEEEEE, 1f)
+
+                .vertex(centerWidth / 2f, 0)
+                .vertex(0, 1f - padding)
+                .vertex(centerWidth * 2f - padding, 0)
+
+                .vertex(centerWidth / 2f, 0)
+                .vertex(0, padding - 1f)
+                .vertex(centerWidth * 2f - padding, 0)
+                .end();
+
+        // gas background
+        GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
+                .color(0xEEEEEE, 1f)
+                .vertex(-centerWidth / 2f, .001f)
+                .vertex(centerWidth / 2f, .001f)
+                .vertex(0, 1f - padding)
+                .end();
+
+        // brake background
+        GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
+                .color(0xEEEEEE, 1f)
+                .vertex(-centerWidth / 2f, -.001f)
+                .vertex(centerWidth / 2f, -.001f)
+                .vertex(0, -1f + padding)
+                .end();
+
         if (turnWidth < 0) {
-            GLBuilder.getBuilder().mode(GL11.GL_QUADS)
+
+//            GLBuilder.getBuilder().mode(GL11.GL_QUADS)
+//                    .color(config.steeringColor, 1f)
+//                    .vertex(-centerWidth / 2f, 0)
+//                    .vertex(0, 1f - padding)
+//                    .vertex(-centerWidth / 2f + turnWidth, 0)
+//                    .vertex(0, padding - 1f)
+//                    .end();
+            GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
                     .color(config.steeringColor, 1f)
+
                     .vertex(-centerWidth / 2f, 0)
                     .vertex(0, 1f - padding)
                     .vertex(-centerWidth / 2f + turnWidth, 0)
+
+                    .vertex(-centerWidth / 2f, 0)
                     .vertex(0, padding - 1f)
+                    .vertex(-centerWidth / 2f + turnWidth, 0)
                     .end();
+
+
         } else if (turnWidth > 0) {
-            GLBuilder.getBuilder().mode(GL11.GL_QUADS)
+//            GLBuilder.getBuilder().mode(GL11.GL_QUADS)
+//                    .color(config.steeringColor, 1f)
+//                    .vertex(centerWidth / 2f, 0)
+//                    .vertex(0, 1f - padding)
+//                    .vertex(centerWidth / 2f + turnWidth, 0)
+//                    .vertex(0, padding - 1f)
+//                    .end();
+            GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
                     .color(config.steeringColor, 1f)
+
                     .vertex(centerWidth / 2f, 0)
                     .vertex(0, 1f - padding)
                     .vertex(centerWidth / 2f + turnWidth, 0)
+
+                    .vertex(centerWidth / 2f, 0)
                     .vertex(0, padding - 1f)
+                    .vertex(centerWidth / 2f + turnWidth, 0)
                     .end();
+
         }
 
         //WIREFRAMES
@@ -60,17 +126,17 @@ public class DrawModeB extends AbstractDrawMode {
                 .vertex(0, padding - 1f)
                 .vertex(centerWidth / 2f, 0)
                 .end();
-        if (config.isAnalogueSteering) {
+        if (config.controls.isAnalogueSteering) {
             //33%
             GLBuilder.getBuilder().mode(GL11.GL_LINES)
                     .color(60, 60, 60, 191)
                     .vertex(0, 1f - padding)
-                    .vertex(centerWidth / 2f + maxTurnWidth / 3f,0)
-                    .vertex(centerWidth / 2f + maxTurnWidth / 3f,0)
+                    .vertex(centerWidth / 2f + maxTurnWidth / 3f, 0)
+                    .vertex(centerWidth / 2f + maxTurnWidth / 3f, 0)
                     .vertex(0, padding - 1f)
                     .vertex(0, 1f - padding)
-                    .vertex(-centerWidth / 2f - maxTurnWidth / 3f,0)
-                    .vertex(-centerWidth / 2f - maxTurnWidth / 3f,0)
+                    .vertex(-centerWidth / 2f - maxTurnWidth / 3f, 0)
+                    .vertex(-centerWidth / 2f - maxTurnWidth / 3f, 0)
                     .vertex(0, padding - 1f)
                     .end();
 
@@ -78,12 +144,12 @@ public class DrawModeB extends AbstractDrawMode {
             GLBuilder.getBuilder().mode(GL11.GL_LINES)
                     .color(60, 60, 60, 191)
                     .vertex(0, 1f - padding)
-                    .vertex(centerWidth / 2f + maxTurnWidth * 2 / 3f,0)
-                    .vertex(centerWidth / 2f + maxTurnWidth * 2 / 3f,0)
+                    .vertex(centerWidth / 2f + maxTurnWidth * 2 / 3f, 0)
+                    .vertex(centerWidth / 2f + maxTurnWidth * 2 / 3f, 0)
                     .vertex(0, padding - 1f)
                     .vertex(0, 1f - padding)
-                    .vertex(-centerWidth / 2f - maxTurnWidth * 2 / 3f,0)
-                    .vertex(-centerWidth / 2f - maxTurnWidth * 2 / 3f,0)
+                    .vertex(-centerWidth / 2f - maxTurnWidth * 2 / 3f, 0)
+                    .vertex(-centerWidth / 2f - maxTurnWidth * 2 / 3f, 0)
                     .vertex(0, padding - 1f)
                     .end();
         }

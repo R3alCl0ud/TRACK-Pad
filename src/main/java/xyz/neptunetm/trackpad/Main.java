@@ -1,12 +1,14 @@
 package xyz.neptunetm.trackpad;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.File;
@@ -24,7 +26,7 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Main {
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private long window;
 
@@ -102,7 +104,7 @@ public class Main {
         // already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden
         // after creation
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be
         // resizable
 
         // Create the window
@@ -162,7 +164,11 @@ public class Main {
         GL11.glEnd();
 
         glPolygonMode(GL_FRONT, GL_FILL);
-        glEnable(GL_BLEND | GL_POLYGON_SMOOTH | GL_LINE_SMOOTH | GL_POINT_SMOOTH);
+        glEnable(GL_BLEND);
+        glEnable(GL_POLYGON_SMOOTH);
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_POINT_SMOOTH);
+        GL14.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
         glLineWidth(2.5f);
 
         drawFunction.drawSteering(steering);
@@ -175,28 +181,43 @@ public class Main {
         steering_buffer = GLFW.glfwGetJoystickAxes(0);
         buttons_buffer = glfwGetJoystickButtons(GLFW_JOYSTICK_1);
 
-//        if (steering_buffer != null) {
-        if (config.isAnalogueSteering) {
-            steering = steering_buffer.get(0);
+        // if (steering_buffer != null) {
+        if (config.controls.isAnalogueSteering) {
+            steering = steering_buffer.get(config.controls.stick);
         } else {
-            //TODO:
-            // never gonna give you up, never gonna let you down, never gonna implement you, or merge you
+            try {
+                steering = buttons_buffer.get(config.controls.right) - buttons_buffer.get(config.controls.left);
+            } catch (Exception e) {
+                // implements keyboard support in a kinda dumb way
+                steering = glfwGetKey(window, config.controls.right) - glfwGetKey(window, config.controls.left);
+            }
         }
-        if (!config.isDigitalThrottle) {
-            brake = (steering_buffer.get(2) + 1) / 2f;
-            gas = (steering_buffer.get(5) + 1) / 2f;
+        // }
+        if (config.controls.isAnalogueThrottle) {
+            // if (steering_buffer != null) {
+            brake = (steering_buffer.get(config.controls.brake) + 1) / 2f;
+            gas = (steering_buffer.get(config.controls.gas) + 1) / 2f;
+            // }
         } else {
-            //TODO:
-            brake = buttons_buffer.get(config.brake_axis);
-            gas = buttons_buffer.get(config.gas_axis);
+            // if (buttons_buffer != null) {
+            try {
+                brake = buttons_buffer.get(config.controls.brake);
+                gas = buttons_buffer.get(config.controls.gas);
+            } catch (Exception e) {
+//                e.printStackTrace();
+                gas = glfwGetKey(window, config.controls.gas);
+                brake = glfwGetKey(window, config.controls.brake);
+            }
+            // }
         }
+
         if (Math.abs(steering) < config.steeringDeadzone)
             steering = 0;
         if (Math.abs(brake) < 0.1)
             brake = 0;
         if (Math.abs(gas) < 0.1)
             gas = 0;
-//        }
+        // }
     }
 
 

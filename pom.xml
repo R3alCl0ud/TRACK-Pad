@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>neptune-tm</groupId>
+    <groupId>neptunetm</groupId>
     <artifactId>trackpad</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Game</name>
@@ -9,7 +9,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <lwjgl.version>3.1.1</lwjgl.version>
+        <lwjgl.version>3.2.3</lwjgl.version>
     </properties>
     <dependencies>
         <dependency>
@@ -297,7 +297,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>xyz.neptunetm.Main</mainClass>
+                            <mainClass>xyz.neptunetm.trackpad.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
