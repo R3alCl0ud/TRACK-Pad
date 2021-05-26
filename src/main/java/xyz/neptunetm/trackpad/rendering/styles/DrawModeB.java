@@ -1,6 +1,9 @@
-package xyz.neptunetm.trackpad;
+package xyz.neptunetm.trackpad.rendering.styles;
 
 import org.lwjgl.opengl.GL11;
+import xyz.neptunetm.trackpad.config.Config;
+import xyz.neptunetm.trackpad.GLBuilder;
+import xyz.neptunetm.trackpad.rendering.AbstractDrawMode;
 
 public class DrawModeB extends AbstractDrawMode {
     private final float centerWidth = .5f;
