@@ -35,14 +35,14 @@ public class TrackPadGui extends JFrame {
         loadConfig();
         drawMode = new DrawModeB(config);
         setLayout(new GridLayout(1, 2));
-        setSize(600, 600);
+        setSize(config.window.width, config.window.height);
         add(new JButton("TEST"));
         GLComponent glComponent = new GLComponent(config);
         add(glComponent, BorderLayout.CENTER);
         setVisible(true);
 
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent windowEvent){
+            public void windowClosing(WindowEvent windowEvent) {
                 System.exit(0);
             }
         });
@@ -51,7 +51,6 @@ public class TrackPadGui extends JFrame {
     }
 
     public void loadConfig() {
-
         File cfg = new File("./config.json");
         if (cfg.exists()) {
             try (FileReader reader = new FileReader(cfg)) {
@@ -64,6 +63,9 @@ public class TrackPadGui extends JFrame {
         } else {
             config = new Config();
             writeConfig();
+        }
+        if (config != null && drawMode != null) {
+            drawMode.setConfig(config);
         }
     }
 
