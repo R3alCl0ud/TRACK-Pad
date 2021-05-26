@@ -1,6 +1,8 @@
-package xyz.neptunetm.trackpad;
+package xyz.neptunetm.trackpad.rendering.styles;
 
 import org.lwjgl.opengl.GL11;
+import xyz.neptunetm.trackpad.config.Config;
+import xyz.neptunetm.trackpad.rendering.AbstractDrawMode;
 
 import static org.lwjgl.opengl.GL11.*;
 

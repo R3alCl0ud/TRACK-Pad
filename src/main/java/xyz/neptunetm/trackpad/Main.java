@@ -10,6 +10,9 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.system.MemoryStack;
+import xyz.neptunetm.trackpad.config.Config;
+import xyz.neptunetm.trackpad.rendering.AbstractDrawMode;
+import xyz.neptunetm.trackpad.rendering.styles.DrawModeB;
 
 import java.io.File;
 import java.io.FileReader;
@@ -41,7 +44,7 @@ public class Main {
     private FloatBuffer steering_buffer;
     private ByteBuffer buttons_buffer;
 
-    private DrawFunction drawFunction;
+    private AbstractDrawMode drawFunction;
 
     public static void main(String... args) {
         new Main().loadConfig().run();

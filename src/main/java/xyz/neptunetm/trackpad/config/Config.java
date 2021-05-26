@@ -1,4 +1,4 @@
-package xyz.neptunetm.trackpad;
+package xyz.neptunetm.trackpad.config;
 
 public class Config {
     public int steeringColor = 0xD25943;
