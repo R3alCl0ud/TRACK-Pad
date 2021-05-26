@@ -6,6 +6,7 @@ public class DrawModeB extends AbstractDrawMode {
     private final float centerWidth = .5f;
     private final float padding = .05f;
 
+
     public DrawModeB(Config config) {
         super(config);
     }
@@ -17,7 +18,7 @@ public class DrawModeB extends AbstractDrawMode {
 
         //left_arrow background
         GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
-                .color(0xEEEEEE, 1f)
+                .color(config.controls.backgroundColor, 1f)
 
                 .vertex(-centerWidth / 2f, 0)
                 .vertex(0, 1f - padding)
@@ -29,7 +30,7 @@ public class DrawModeB extends AbstractDrawMode {
                 .end();
         // right arrow background
         GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
-                .color(0xEEEEEE, 1f)
+                .color(config.controls.backgroundColor, 1f)
 
                 .vertex(centerWidth / 2f, 0)
                 .vertex(0, 1f - padding)
@@ -42,7 +43,7 @@ public class DrawModeB extends AbstractDrawMode {
 
         // gas background
         GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
-                .color(0xEEEEEE, 1f)
+                .color(config.controls.backgroundColor, 1f)
                 .vertex(-centerWidth / 2f, .001f)
                 .vertex(centerWidth / 2f, .001f)
                 .vertex(0, 1f - padding)
@@ -50,7 +51,7 @@ public class DrawModeB extends AbstractDrawMode {
 
         // brake background
         GLBuilder.getBuilder().mode(GL11.GL_TRIANGLES)
-                .color(0xEEEEEE, 1f)
+                .color(config.controls.backgroundColor, 1f)
                 .vertex(-centerWidth / 2f, -.001f)
                 .vertex(centerWidth / 2f, -.001f)
                 .vertex(0, -1f + padding)

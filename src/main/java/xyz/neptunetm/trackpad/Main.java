@@ -30,9 +30,8 @@ public class Main {
 
     private long window;
 
-    public static float left_control = -0.1f; // stores the amount of which the joy stick is turned left
-    public static float right_control = 0.1f;
-    public static float display_padding = 0.1f;
+    private boolean isHeld = false;
+
     public static float steering;
     public static float brake;
     public static float gas;
@@ -62,6 +61,9 @@ public class Main {
         } else {
             config = new Config();
             writeConfig();
+        }
+        if (config != null && drawFunction != null) {
+            drawFunction.setConfig(config);
         }
         return this;
     }
@@ -156,7 +158,7 @@ public class Main {
 
 //        GL11.glPushMatrix();
         GL11.glBegin(GL_QUADS);
-        setDrawColor(config.backgroundColor);
+        setDrawColor(config.window.backgroundColor);
         glVertex2f(-1f, 1);
         glVertex2f(1f, 1);
         glVertex2f(1f, -1);
@@ -178,37 +180,59 @@ public class Main {
 
 
     private void handleJoyshits() {
+        if (!isHeld && glfwGetKey(window, GLFW_KEY_TAB) == 1) {
+            System.out.println("Reloading config master");
+            loadConfig();
+            isHeld = true;
+        } else if (isHeld && glfwGetKey(window, GLFW_KEY_TAB) != 1) {
+            isHeld = false;
+        }
+
         steering_buffer = GLFW.glfwGetJoystickAxes(0);
         buttons_buffer = glfwGetJoystickButtons(GLFW_JOYSTICK_1);
 
         // if (steering_buffer != null) {
         if (config.controls.isAnalogueSteering) {
-            steering = steering_buffer.get(config.controls.stick);
-        } else {
-            try {
-                steering = buttons_buffer.get(config.controls.right) - buttons_buffer.get(config.controls.left);
-            } catch (Exception e) {
-                // implements keyboard support in a kinda dumb way
-                steering = glfwGetKey(window, config.controls.right) - glfwGetKey(window, config.controls.left);
+            if (glfwJoystickPresent(0)) {
+                try {
+                    steering = steering_buffer.get(config.controls.stick);
+                } catch (Exception ignored) {
+                }
+            } else {
+                if (glfwJoystickPresent(0)) {
+                    try {
+                        steering = buttons_buffer.get(config.controls.right) - buttons_buffer.get(config.controls.left);
+                    } catch (Exception ignored) {
+                    }
+                } else {
+                    // implements keyboard support in a kinda dumb way
+                    steering = glfwGetKey(window, config.controls.right) - glfwGetKey(window, config.controls.left);
+                }
             }
         }
-        // }
         if (config.controls.isAnalogueThrottle) {
-            // if (steering_buffer != null) {
-            brake = (steering_buffer.get(config.controls.brake) + 1) / 2f;
-            gas = (steering_buffer.get(config.controls.gas) + 1) / 2f;
-            // }
-        } else {
-            // if (buttons_buffer != null) {
-            try {
-                brake = buttons_buffer.get(config.controls.brake);
-                gas = buttons_buffer.get(config.controls.gas);
-            } catch (Exception e) {
-//                e.printStackTrace();
-                gas = glfwGetKey(window, config.controls.gas);
-                brake = glfwGetKey(window, config.controls.brake);
+            if (glfwJoystickPresent(0)) {
+                try {
+                    brake = (steering_buffer.get(config.controls.brake) + 1) / 2f;
+                    gas = (steering_buffer.get(config.controls.gas) + 1) / 2f;
+                } catch (Exception ignored) {
+                }
             }
-            // }
+        } else {
+            if (glfwJoystickPresent(0)) {
+
+                try {
+                    brake = buttons_buffer.get(config.controls.brake);
+                    gas = buttons_buffer.get(config.controls.gas);
+                } catch (Exception ignored) {
+                }
+            } else {
+                try {
+                    gas = glfwGetKey(window, config.controls.gas);
+                    brake = glfwGetKey(window, config.controls.brake);
+                } catch (Exception ignored) {
+                }
+            }
         }
 
         if (Math.abs(steering) < config.steeringDeadzone)
